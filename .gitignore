@@ -9,7 +9,7 @@ lerna-debug.log*
 
 node_modules
 server.js
-server.map.js
+server.js.map
 *.local
 
 # Editor directories and files
