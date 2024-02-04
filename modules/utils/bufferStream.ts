@@ -1,8 +1,6 @@
-import http from "http";
+import { Stream } from "stream";
 
-export default function bufferStream(
-    stream: http.IncomingMessage
-): Promise<Buffer> {
+export default function bufferStream(stream: Stream): Promise<Buffer> {
     return new Promise(
         (accept: (buffer: Buffer) => void, reject: (err: Error) => void) => {
             const chunks: Buffer[] = [];

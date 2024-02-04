@@ -3,6 +3,7 @@ import semver from "semver";
 
 import { getVersionsAndTags, getPackageConfig } from "modules/utils/npm";
 import { LogType, PackageRequestType } from "modules/types";
+import asyncHandler from "modules/utils/asyncHandler";
 
 const createPackageURL = (
     packageName: string,
@@ -96,4 +97,4 @@ const validatePackageVersion: RequestHandler = async (
     next();
 };
 
-export default validatePackageVersion;
+export default asyncHandler(validatePackageVersion);

@@ -1,7 +1,8 @@
 import https from "https";
 import http from "http";
-// import gunzip from "gunzip-maybe";
+import gunzip from "gunzip-maybe";
 import { LRUCache } from "lru-cache";
+import { Transform } from "stream";
 
 import {
     LogType,
@@ -216,42 +217,45 @@ export const getPackageConfig = async (
 /**
  * Returns a stream of the tarball'd contents of the given package.
  */
-// export async function getPackage(packageName, version, log) {
-//     const tarballName = isScopedPackageName(packageName)
-//         ? packageName.split("/")[1]
-//         : packageName;
-//     const tarballURL = `${npmRegistryURL}/${packageName}/-/${tarballName}-${version}.tgz`;
+export const getPackage = async (
+    packageName: string,
+    version: string,
+    log: LogType
+): Promise<Transform | null> => {
+    const tarballName = isScopedPackageName(packageName)
+        ? packageName.split("/")[1]
+        : packageName;
+    const tarballURL = `${NPM_REGISTRY_URL}/${packageName}/-/${tarballName}-${version}.tgz`;
 
-//     log.debug("Fetching package for %s from %s", packageName, tarballURL);
+    log.debug("Fetching package for %s from %s", packageName, tarballURL);
 
-//     const { hostname, pathname } = url.parse(tarballURL);
-//     const options = {
-//         agent: agent,
-//         hostname: hostname,
-//         path: pathname,
-//     };
+    const { hostname, pathname } = new URL(tarballURL);
+    const options: https.RequestOptions = {
+        agent: AGENT,
+        hostname: hostname,
+        path: pathname,
+    };
 
-//     const res = await get(options);
+    const res = await get(options);
 
-//     if (res.statusCode === 200) {
-//         const stream = res.pipe(gunzip());
-//         // stream.pause();
-//         return stream;
-//     }
+    if (res.statusCode === 200) {
+        const stream = res.pipe(gunzip());
+        return stream;
+    }
 
-//     if (res.statusCode === 404) {
-//         return null;
-//     }
+    if (res.statusCode === 404) {
+        return null;
+    }
 
-//     const content = (await bufferStream(res)).toString("utf-8");
+    const content = (await bufferStream(res)).toString("utf-8");
 
-//     log.error(
-//         "Error fetching tarball for %s@%s (status: %s)",
-//         packageName,
-//         version,
-//         res.statusCode
-//     );
-//     log.error(content);
+    log.error(
+        "Error fetching tarball for %s@%s (status: %s)",
+        packageName,
+        version,
+        String(res.statusCode)
+    );
+    log.error(content);
 
-//     return null;
-// }
+    return null;
+};

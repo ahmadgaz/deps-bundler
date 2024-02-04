@@ -8,8 +8,8 @@ import validatePackagePathname from "./middleware/validatePackagePathname";
 import validatePackageName from "./middleware/validatePackageName";
 import validatePackageVersion from "./middleware/validatePackageVersion";
 import validateFilename from "./middleware/validateFilename";
-// import findEntry from "./middleware/findEntry";
-// import serveFile from "./middleware/serveFile";
+import findEntry from "./middleware/findEntry";
+import serveFile from "./middleware/serveFile";
 
 const app = express();
 
@@ -32,9 +32,9 @@ app.get(
     validatePackagePathname,
     validatePackageName,
     validatePackageVersion,
-    validateFilename
-    // findEntry,
-    // serveFile
+    validateFilename,
+    findEntry,
+    serveFile
 );
 
 app.listen(3000, () => {
