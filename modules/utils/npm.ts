@@ -118,14 +118,12 @@ export const getVersionsAndTags = async (
 ): Promise<PackageVersionMetadataType | null> => {
     const cacheKey = `versions-${packageName}`;
     const cacheValue = CACHE.get(cacheKey);
-    console.log("cacheValue", cacheValue);
 
     if (cacheValue != undefined) {
         return cacheValue === NOT_FOUND ? null : JSON.parse(cacheValue);
     }
 
     const value = await fetchVersionsAndTags(packageName, log);
-    console.log("value", value);
 
     if (value == null) {
         CACHE.set(cacheKey, NOT_FOUND, {

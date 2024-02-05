@@ -41,7 +41,7 @@ const validateFilename: RequestHandler = (
     res: Response,
     next: NextFunction
 ): void => {
-    if (!res.locals.package.filename) {
+    if (!res.locals.package.filename || res.locals.package.filename === "/") {
         return filenameRedirect(res);
     }
 

@@ -89,13 +89,16 @@ const searchEntries = (
 
         const matchingEntries: Record<string, Entry> = {};
         let foundEntry: Entry;
-        if (filename === "/") {
-            foundEntry = matchingEntries["/"] = {
-                name: "/",
-                type: "directory",
-            };
-        }
-        console.log(stream);
+
+        // Analyze package.json
+        //      Recursively resolve dependencies (get tgz) and add them all to a node_modules folder.
+        //      Check all entry points for the package against the import statement. These are main, module, exports, browser + submodule details or plugins.
+        //
+
+        // Build file tree first
+
+        // Bundle foundEntry into a single entry
+
         stream
             .pipe(tar.extract())
             .on("error", reject)
@@ -109,24 +112,17 @@ const searchEntries = (
                     type: header.type,
                 };
 
-                console.log(entry);
-
                 // Skip non-files and files that don't match the entryName.
                 if (
                     entry.type !== "file" ||
                     !entry.path?.startsWith(filename)
                 ) {
-                    console.log("skipping");
                     stream.resume();
                     stream.on("end", next);
                     return;
                 }
 
                 matchingEntries[entry.path] = entry;
-                console.log(
-                    `matchingEntries[${entry.path}]`,
-                    matchingEntries[entry.path]
-                );
 
                 // Dynamically create "directory" entries for all directories
                 // that are in this file's path. Some tarballs omit these entries
@@ -146,9 +142,7 @@ const searchEntries = (
                     entry.path === jsEntryFilename ||
                     entry.path === jsonEntryFilename
                 ) {
-                    console.log("entry is equal to filename", entry);
                     if (foundEntry) {
-                        console.log("foundEntry", foundEntry);
                         if (
                             foundEntry.path !== filename &&
                             (entry.path === filename ||
@@ -161,7 +155,6 @@ const searchEntries = (
                             foundEntry = entry;
                         }
                     } else {
-                        console.log("foundEntry is null", entry);
                         foundEntry = entry;
                     }
                 }
@@ -176,11 +169,9 @@ const searchEntries = (
 
                     // Set the content only for the foundEntry and
                     // discard the buffer for all others.
-                    console.log("yomama", foundEntry);
                     if (entry === foundEntry) {
                         entry.content = content;
                     }
-                    console.log("Jodada", foundEntry);
 
                     next();
                 } catch (error) {
@@ -188,7 +179,6 @@ const searchEntries = (
                 }
             })
             .on("finish", () => {
-                console.log(foundEntry);
                 accept({
                     // If we didn't find a matching file entry,
                     // try a directory entry with the same name.
@@ -229,8 +219,6 @@ const findEntry: RequestHandler = async (
         stream,
         res.locals.package.filename
     );
-    console.log("entry", entry);
-    console.log("entries", entries);
 
     if (!entry) {
         return res

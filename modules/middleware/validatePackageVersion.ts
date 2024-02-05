@@ -44,11 +44,9 @@ const resolveVersion = async (
     if (versionsAndTags) {
         const { versions, tags } = versionsAndTags;
 
-        console.log("range", range);
         if (range in tags) {
             range = tags[range];
         }
-        console.log("range", range);
         return versions.includes(range)
             ? range
             : semver.maxSatisfying(versions, range);
@@ -69,8 +67,6 @@ const validatePackageVersion: RequestHandler = async (
 ): Promise<void | Response> => {
     const info: PackageRequestType = res.locals.package;
     const log: LogType = res.locals.log;
-
-    console.log("info", info);
 
     const version = await resolveVersion(info.name, info.version, log);
 
